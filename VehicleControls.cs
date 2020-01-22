@@ -10,14 +10,14 @@ namespace VehicleControls
 {
     public class VehicleControls : BaseScript
     {
-        private static string ERROR = "~r~Error: ";
-        private static string ERROR_NOCAR = ERROR + "You aren't in a vehicle nor do you have a saved vehicle.";
+        private static string ERROR = "~r~錯誤: ";
+        private static string ERROR_NOCAR = ERROR + "你不在車輛內或者你不擁有這輛車";
 
         private Vehicle savedVehicle;
 
         private void AddEngineItem(UIMenu menu)
         {
-            var newItem = new UIMenuItem("Toggle Engine");
+            var newItem = new UIMenuItem("引擎開關");
             menu.AddItem(newItem);
 
             menu.OnItemSelect += (sender, item, index) =>
@@ -51,13 +51,13 @@ namespace VehicleControls
         {
             if (car.IsEngineRunning)
             {
-                Screen.ShowNotification("Engine is now ~r~off~w~.");
+                Screen.ShowNotification("引擎 ~r~熄火~w~.");
                 car.IsDriveable = false;
                 car.IsEngineRunning = false;
             }
             else
             {
-                Screen.ShowNotification("Engine is now ~g~on~w~.");
+                Screen.ShowNotification("引擎 ~g~發動~w~.");
                 car.IsDriveable = true;
                 car.IsEngineRunning = true;
             }
@@ -65,7 +65,7 @@ namespace VehicleControls
 
         private void AddDoorLockItem(UIMenu menu)
         {
-            var newItem = new UIMenuItem("Toggle Door Lock", "NOTE: This will also set this vehicle as saved vehicle.");
+            var newItem = new UIMenuItem("車門開關", "注意:這項操作將自動儲存此車輛");
             menu.AddItem(newItem);
 
             menu.OnItemSelect += (sender, item, index) =>
@@ -100,12 +100,12 @@ namespace VehicleControls
 
             if (doorLocked)
             {
-                Screen.ShowNotification("Doors are ~g~unlocked~w~.");
+                Screen.ShowNotification("車門已經 ~g~解鎖了~w~.");
                 Function.Call(Hash.SET_VEHICLE_DOORS_LOCKED, car, 0);
             }
             else
             {
-                Screen.ShowNotification("Doors are ~r~locked~w~.");
+                Screen.ShowNotification("車門已經 ~r~鎖住了~w~.");
                 Function.Call(Hash.SET_VEHICLE_DOORS_LOCKED, car, 2);
             }
         }
@@ -114,14 +114,14 @@ namespace VehicleControls
         {
             List<dynamic> doors = new List<dynamic>
             {
-                "Front Left",
-                "Front Right",
-                "Back Left",
-                "Back Right",
-                "Hood",
-                "Trunk"
+                "左前",
+                "右前",
+                "左後",
+                "右後",
+                "引擎蓋",
+                "後車箱"
             };
-            var newItem = new UIMenuListItem("Toggle Door", doors, 0);
+            var newItem = new UIMenuListItem("開關車門", doors, 0);
             menu.AddItem(newItem);
 
             menu.OnItemSelect += (sender, item, index) =>
@@ -158,19 +158,19 @@ namespace VehicleControls
             bool doorBroken = Function.Call<bool>(Hash.IS_VEHICLE_DOOR_DAMAGED, car, index);
             if (doorBroken)
             {
-                Screen.ShowNotification(ERROR + "Door is broken.");
+                Screen.ShowNotification(ERROR + "車門已損毀");
                 return;
             }
 
             float doorAngle = Function.Call<float>(Hash.GET_VEHICLE_DOOR_ANGLE_RATIO, car, index);
             if (doorAngle == 0) // Door is closed
             {
-                Screen.ShowNotification(doorName + " Door is now ~g~open~w~.");
+                Screen.ShowNotification(doorName + " 車門已經 ~g~開啟了~w~.");
                 Function.Call(Hash.SET_VEHICLE_DOOR_OPEN, car, index, false, false);
             }
             else
             {
-                Screen.ShowNotification(doorName + " Door is now ~r~shut~w~.");
+                Screen.ShowNotification(doorName + " 車門已經 ~r~關閉了~w~.");
                 Function.Call(Hash.SET_VEHICLE_DOOR_SHUT, car, index, false);
             }
         }
@@ -185,7 +185,7 @@ namespace VehicleControls
             {
                 speeds.Add(i + " KM/H");
             }
-            UIMenuListItem newItem = new UIMenuListItem("Lock Max Speed", speeds, 0);
+            UIMenuListItem newItem = new UIMenuListItem("鎖定最高時速", speeds, 0);
             menu.AddItem(newItem);
 
             menu.OnItemSelect += (sender, item, index) =>
@@ -221,18 +221,18 @@ namespace VehicleControls
             if (itemName[0] == "None")
             {
                 car.MaxSpeed = int.MaxValue;
-                Screen.ShowNotification($"Speedlimit has been removed.");
+                Screen.ShowNotification($"車輛限速已被解除");
                 return;
             }
 
             float itemSpeed = float.Parse(itemName[0]) / 3.6f;
             car.MaxSpeed = itemSpeed;
-            Screen.ShowNotification($"Speed has been limited to {itemName[0]} {itemName[1]}.");
+            Screen.ShowNotification($"車輛已被限速在 {itemName[0]} {itemName[1]}.");
         }
 
         private void AddSaveVehicleItem(UIMenu menu)
         {
-            var newItem = new UIMenuItem("Save vehicle");
+            var newItem = new UIMenuItem("儲存車輛");
             menu.AddItem(newItem);
 
             menu.OnItemSelect += (sender, item, index) =>
@@ -251,7 +251,7 @@ namespace VehicleControls
                 }
 
                 SaveVehicle(car);
-                Screen.ShowNotification("Saved vehicle.");
+                Screen.ShowNotification("已成功儲存車輛");
             };
         }
 
@@ -275,7 +275,7 @@ namespace VehicleControls
         {
             MenuPool menuPool = new MenuPool();
 
-            UIMenu menu = new UIMenu("Vehicle Controls", "");
+            UIMenu menu = new UIMenu("代客修改此", "");
             menuPool.Add(menu);
 
             AddEngineItem(menu);
